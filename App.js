@@ -4,21 +4,17 @@ import { Text, View, ScrollView, SafeAreaView, TextInput, Pressable, Alert } fro
 import DropDownPicker from 'react-native-dropdown-picker';
 import Radiobutton from './components/Radiobutton';
 import CalculateButton from './components/CalculateButton';
-
 import Styles from './Styles'
 
 export default function App() {
 
-
-  // Määritellään tilamuuttjat
-  const [weight, setWeight] = useState(0);
+  const [weight, setWeight] = useState(0);                // Määritellään tilamuuttjat
   const [bottles, setBottles] = useState(0);
   const [hours, setHours] = useState(0);
   const [gender, setGender] = useState('Male');
   const [promilles, setPromilles] = useState(0);
 
-  // Radiobuttonin vaihtoehdot määritellään taulukkona, jonka alkiot ovat olioita, sisältäen avain-arvo parin sukupuolelle
-  const genderOptions = [
+  const genderOptions = [                                 // Radiobutton-komponentin vaihtoehdot määritetään olioina taulukkoon.
     {
       label: 'Male',
       value: 'Male'
@@ -29,112 +25,28 @@ export default function App() {
     }
   ]
 
-  // Dropdownpickerin tarvitsemat tilamuuttujat. Items muuttujalle varmaan löytyisi parempikin tapa asettaa arvot, kuin kovakoodaamaalla.
-  const [open, setOpen] = useState(false)
-  const [items, setItems] = useState([
-    {
-      label: '1',
-      value: 1
-    },
-    {
-      label: '2',
-      value: 2
-    },
-    {
-      label: '3',
-      value: 3
-    },
-    {
-      label: '4',
-      value: 4
-    },
-    {
-      label: '5',
-      value: 5
-    },
-    {
-      label: '6',
-      value: 6
-    },
-    {
-      label: '7',
-      value: 7
-    },
-    {
-      label: '8',
-      value: 8
-    },
-    {
-      label: '9',
-      value: 9
-    },
-    {
-      label: '10',
-      value: 10
-    }
-  ])
+  
+  const [open, setOpen] = useState(false)                 // Bottles dropdownpickerin tilamuuttujat
+  const [items, setItems] = useState(
+    Array(10).fill('').map((_,i) => ({label: (i+1).toString(), value: i+1}))
+  )
 
-  // Toisen dropdownpickerin tarvitsemat tilamuuttujat
-  const [openSecond, setOpenSecond] = useState(false);
-  const [secondItems, setSecondItems] = useState([
-    {
-      label: '1 hour',
-      value: 1
-    },
-    {
-      label: '2 hours',
-      value: 2
-    },
-    {
-      label: '3 hours',
-      value: 3
-    },
-    {
-      label: '4 hours',
-      value: 4
-    },
-    {
-      label: '5 hours',
-      value: 5
-    },
-    {
-      label: '6 hours',
-      value: 6
-    },
-    {
-      label: '7 hours',
-      value: 7
-    },
-    {
-      label: '8 hours',
-      value: 8
-    },
-    {
-      label: '9 hours',
-      value: 9
-    },
-    {
-      label: '10 hours',
-      value: 10
-    }
+  const [openSecond, setOpenSecond] = useState(false);    // Time dropdownpickerin tilamuuttujat
+  const [secondItems, setSecondItems] = useState(
+    Array(10).fill('').map((_,i) => ({label: `${i+1} hours`, value: i+1}))
+    )
 
-  ])
-
-  // funktio joka suoritetaan, kun Bottles dropdown-valikko avataan. Sulkee toisen Time-valikon.
-  const onOpen = useCallback(() => {
+  const onOpen = useCallback(() => {                      //Funktio, joka avaa Bottles-valikon ja samalla sulkee Time-valikon
     setOpenSecond(false);
   }, []);
 
-  // funktio, joka suoritetaan, kun Time dropdown-valikko avataan. Sulkee Bottles-valikon.
-  const onOpenSecond = useCallback(() => {
+  const onOpenSecond = useCallback(() => {                // Funktio, joka avaa Time-valikon ja sulkee Bottles-valikon
     setOpen(false);
   }, [])
   
-  // funktio, jossa suoritetaan promillemäärän lasku. Käyttää tilamuuttujien arvoja, sekä annettua kaavaa. 
-  // Huolehtii myös if-lauseessa siitä, että negatiiviset tulokset esitetään nollana.
-  const calculatePromilles = () => {
-    if (weight > 0){
-      if (bottles === 0){
+  const calculatePromilles = () => {                      // Funktio, jossa lasketaan promillemäärä
+    if (weight > 0){                                      // Alussa tarkistetaan, onko Bottles tai Time arvoja valittu
+      if (bottles === 0){                                 // ja annetaan näytölle alert, jos ei.
         Alert.alert(
           "Bottles missing!",
           "Select amount of bottles drank."
@@ -147,23 +59,23 @@ export default function App() {
         )
         return
       }
-      let grams = (bottles * 0.33) * 8 * 4.5;
-      let burning = weight / 10;
+      let grams = (bottles * 0.33) * 8 * 4.5;               // Määritellään laskukaavassa tarvittavien muuttujien arvot
+      let burning = weight / 10;                            // annetun kaavan mukaan.    
       let gramsLeft = grams - burning * hours;
       let result;
-      if(gender === 'Male'){
-        result = gramsLeft / (weight * 0.7)
+      if(gender === 'Male'){                                // If-lauseissa lasketaan promillemäärä käyttäjän syöttämän
+        result = gramsLeft / (weight * 0.7)                 // sukupuolen mukaan.
       } else {
         result = gramsLeft / (weight * 0.6)
       }
-      if(result < 0){
+      if(result < 0){                                       // Asetetaan promilles-tilamuuttujan arvoksi 0, jos tulos negatiivinen.
         setPromilles(0)
       } else {
-        setPromilles(result);
+        setPromilles(result);                               // Asetetaan promilles-tilamuuttujaan laskusta saatu arvo.
       }
     }
-    else {
-      Alert.alert(
+    else {                                                  // Tämä else suoritetaan, jos käyttäjä ei ole syöttänyt painoa
+      Alert.alert(                                          // Eli annetaan ruudulle alert.
         "Weight missing",
         "Type in your weight and calculate again."
       )

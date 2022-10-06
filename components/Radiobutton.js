@@ -2,6 +2,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, {useState} from 'react'
 import Styles from './RadiobuttonStyles'
 
+// Custom radiobutton tehty opettajan ohjeen mukaan.
+
 export default function Radiobutton({options, onPress}) {
 
   const [choice, setChoice] = useState('Male');
